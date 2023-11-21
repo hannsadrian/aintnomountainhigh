@@ -18,13 +18,13 @@ CLIMBING_STATE = "CLIMBING_STATE"
 ev3 = EV3Brick()
 program_state = ORIENTING_STATE
 
-startStopSensor = TouchSensor(Port.S4)
-distanceSensor = UltrasonicSensor(Port.S1)
-gyroSensor = GyroSensor(Port.S2)
-gyroSensor.reset_angle(0)
+kill_switch = TouchSensor(Port.S4)
+distance_sensor = UltrasonicSensor(Port.S1)
+gyro_sensor = GyroSensor(Port.S2)
+gyro_sensor.reset_angle(0)
 
-leftDriveMotor = Motor(Port.A)
-rightDriveMotor = Motor(Port.D)
+left_drive_motor = Motor(Port.A)
+right_drive_motor = Motor(Port.D)
 
 
 
@@ -33,7 +33,7 @@ DRIVE_SPEED = 360 * 2
 ev3.screen.draw_text(10, 10, "waiting to start")
 
 triggering_angle = 10
-while leftDriveMotor.angle() < triggering_angle and rightDriveMotor.angle() < triggering_angle:
+while left_drive_motor.angle() < triggering_angle and right_drive_motor.angle() < triggering_angle:
     pass
 
 ev3.screen.clear()
@@ -43,26 +43,20 @@ while True:
     wait(1)
     counter += 1
 
+    if kill_switch.pressed():
+        quit()
+
     if counter % 200 == 0:
-        d = distanceSensor.distance()
+        d = distance_sensor.distance()
         ev3.screen.clear()
         ev3.screen.draw_text(10, 10, "ultrasonic:" + str(d))
-        ev3.screen.draw_text(10, 30, "gyro-angle:" + str(gyroSensor.angle()))
+        ev3.screen.draw_text(10, 30, "gyro-angle:" + str(gyro_sensor.angle()))
 
     if program_state == ORIENTING_STATE:
-        leftDriveMotor.brake()
-        rightDriveMotor.brake()
-
-        if startStopSensor.pressed():
-            program_state = CLIMBING_STATE
+        left_drive_motor.brake()
+        right_drive_motor.brake()
     
     if program_state == CLIMBING_STATE:
-        leftDriveMotor.run(DRIVE_SPEED)
-        rightDriveMotor.run(DRIVE_SPEED)
-
-        
-
-        # switching to ORIENTING_STATE if not pressed
-        if not startStopSensor.pressed():
-            program_state = ORIENTING_STATE
+        left_drive_motor.run(DRIVE_SPEED)
+        right_drive_motor.run(DRIVE_SPEED)
             
