@@ -8,6 +8,7 @@ from pybricks.robotics import DriveBase
 from pybricks.media.ev3dev import SoundFile, ImageFile, Image
 
 import orientation
+import climbing
 import turning
 
 ORIENTING_STATE = "ORIENTING_STATE"
@@ -36,8 +37,25 @@ lift_motor = Motor(Port.C)
 # --- TEST FIELD ---
 #turning.turn_to(80, horizontal_gyro, left_drive_motor, right_drive_motor, lift_motor)
 #turning.turn_to(-80, horizontal_gyro, left_drive_motor, right_drive_motor, lift_motor)
+#climbing.climbingStep(ev3, left_drive_motor, right_drive_motor, lift_motor, vertical_gyro)
+""" latest_distance_readings = []
+average_distance = distance_sensor.distance()
+distance_variance = 0
+
+counter = 0
+
+while True:
+    counter += 1
+    latest_distance_readings.append(distance_sensor.distance())
+
+    if counter % 50 == 0:
+        average_distance, distance_variance = orientation.do_average_calculation(latest_distance_readings)
+
+    wait(1) """
 # ------------------
 
+while not Button.DOWN in ev3.buttons.pressed():
+    pass
 
 ev3.screen.draw_text(10, 10, "waiting to start")
 
@@ -54,7 +72,7 @@ while True:
     if program_state == ORIENTING_STATE:
         orientation_result = orientation.orientationStep(
             ev3, left_drive_motor, right_drive_motor, 
-            lift_motor, distance_sensor, horizontal_gyro)
+            lift_motor, distance_sensor, horizontal_gyro, vertical_gyro)
         if orientation_result is True:
             program_state = CLIMBING_STATE
         else:
@@ -63,7 +81,6 @@ while True:
 
     
     if program_state == CLIMBING_STATE:
-        #left_drive_motor.run(DRIVE_SPEED)
-        #right_drive_motor.run(DRIVE_SPEED)
-        pass
+        climbing.climbingStep(ev3, left_drive_motor, right_drive_motor, lift_motor, vertical_gyro, distance_sensor)
+        program_state = ORIENTING_STATE
             
