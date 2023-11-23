@@ -29,6 +29,7 @@ def calculate_average_angular_speed(samples: [int]) -> float:
 TURNING_SPEED = 180
 
 def turn_to(angle: int, ev3: EV3Brick, horizontal_gyro: GyroSensor, left: Motor, right: Motor, lift: Motor, vertical_gyro: GyroSensor, ultrasonic: UltrasonicSensor):
+    wait(100)
     lift.reset_angle(0)
     horizontal_gyro.reset_angle(0)
     vertical_gyro.reset_angle(0)
@@ -40,7 +41,7 @@ def turn_to(angle: int, ev3: EV3Brick, horizontal_gyro: GyroSensor, left: Motor,
     angular_speed = 0
 
     counter = 0
-    while abs(horizontal_gyro.angle()) < abs(angle) and vertical_gyro.angle() < 5:
+    while abs(horizontal_gyro.angle()) < abs(angle) and vertical_gyro.angle() < 3:
         counter += 1
         # this code is ran
         # gyro.angle()/angle = 0-1
@@ -54,7 +55,7 @@ def turn_to(angle: int, ev3: EV3Brick, horizontal_gyro: GyroSensor, left: Motor,
 
         inner_boost = 0
         if angular_speed < 6:
-            inner_boost = TURNING_SPEED
+            inner_boost = TURNING_SPEED*1.5
 
         if angle > 0:
             left.run(TURNING_SPEED*ratio+inner_boost*0.5)  #
@@ -69,8 +70,9 @@ def turn_to(angle: int, ev3: EV3Brick, horizontal_gyro: GyroSensor, left: Motor,
     right.brake()
     lift.run_target(1000, 0, Stop.BRAKE, wait=True)
 
-    if vertical_gyro.angle() > 4:
-        climbing.climbingStep(ev3, left, right, lift, vertical_gyro, ultrasonic)
+    if vertical_gyro.angle() > 2:
+        climbing.climbingStep(ev3, left, right, lift, 
+                              vertical_gyro, ultrasonic, is_in_save_mode=True)
 
         turn_to(angle-horizontal_gyro.angle(), ev3, horizontal_gyro, left, right, lift, vertical_gyro, ultrasonic)
 

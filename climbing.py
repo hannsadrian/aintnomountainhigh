@@ -14,7 +14,8 @@ def climbingStep(
         right_motor: Motor, 
         lift_motor: Motor,
         vertical_gyro: GyroSensor,
-        ultrasonic: UltrasonicSensor):
+        ultrasonic: UltrasonicSensor,
+        is_in_save_mode=False):
 
     lift_motor.run(-360)
     wait(200)
@@ -23,7 +24,7 @@ def climbingStep(
     left_motor.run(CLIMBING_SPEED)
     right_motor.run(CLIMBING_SPEED)
 
-    while vertical_gyro.angle() < 10:
+    while vertical_gyro.angle() < 5:
         pass
 
     counter = 0
@@ -37,6 +38,8 @@ def climbingStep(
         pass
 
     wait(100)
+    if is_in_save_mode:
+        wait(100)
 
     left_motor.brake()
     right_motor.brake()

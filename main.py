@@ -38,30 +38,22 @@ lift_motor = Motor(Port.C)
 #turning.turn_to(80, horizontal_gyro, left_drive_motor, right_drive_motor, lift_motor)
 #turning.turn_to(-80, horizontal_gyro, left_drive_motor, right_drive_motor, lift_motor)
 #climbing.climbingStep(ev3, left_drive_motor, right_drive_motor, lift_motor, vertical_gyro)
-""" latest_distance_readings = []
-average_distance = distance_sensor.distance()
-distance_variance = 0
 
-counter = 0
-
-while True:
-    counter += 1
-    latest_distance_readings.append(distance_sensor.distance())
-
-    if counter % 50 == 0:
-        average_distance, distance_variance = orientation.do_average_calculation(latest_distance_readings)
-
-    wait(1) """
 # ------------------
 
 while not Button.DOWN in ev3.buttons.pressed():
     pass
 
+wait(1000)
+
+horizontal_gyro.reset_angle(0)
+vertical_gyro.reset_angle(0)
+
 ev3.screen.draw_text(10, 10, "waiting to start")
 
 left_drive_motor.reset_angle(0)
 right_drive_motor.reset_angle(0)
-triggering_angle = 5
+triggering_angle = 1
 while left_drive_motor.angle() < triggering_angle and right_drive_motor.angle() < triggering_angle:
     pass
 
@@ -70,7 +62,7 @@ ev3.screen.clear()
 start_off_angle = 90
 left_drive_motor.run_target(180, start_off_angle, wait=False)
 right_drive_motor.run_target(180, start_off_angle, wait=True)
-turning.turn_to(-80, ev3, horizontal_gyro, left_drive_motor, right_drive_motor, lift_motor, vertical_gyro, distance_sensor)
+turning.turn_to(-77, ev3, horizontal_gyro, left_drive_motor, right_drive_motor, lift_motor, vertical_gyro, distance_sensor)
 
 climbing_step_number = 0
 while climbing_step_number < 6:
@@ -94,3 +86,17 @@ while climbing_step_number < 6:
             
 ev3.screen.clear()
 ev3.screen.draw_text(10, 10, "top reached!")
+
+wait(1000)
+
+finish_off_time = 1500
+left_drive_motor.run_time(180, finish_off_time, wait=False)
+right_drive_motor.run_time(180, finish_off_time, wait=True)
+
+turning.turn_to(-80, ev3, horizontal_gyro, left_drive_motor, right_drive_motor, lift_motor, vertical_gyro, distance_sensor)
+
+left_drive_motor.run_time(180, finish_off_time, wait=False)
+right_drive_motor.run_time(180, finish_off_time, wait=True)
+
+while True:
+    pass
