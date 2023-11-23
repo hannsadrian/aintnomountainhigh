@@ -6,11 +6,11 @@ from pybricks.tools import wait
 import turning
 
 LEVEL = [125, 152]
-LOW = [107, 125]
-IDEAL = [85, 107]
+LOW = [110, 125]
+IDEAL = [85, 110]
 HIGH = [0, 85]
 
-CRAWLING_SPEED = 180
+CRAWLING_SPEED = 90
 
 LEFT = "LEFT"
 CENTER = "CENTER"
@@ -70,11 +70,11 @@ def orientationStep(
         distance_variance = 0
 
         counter = 0
-        while counter < 51 or LEVEL[0] <= average_distance <= LEVEL[1] or distance_variance > 3 or abs(vertical_gyro.angle()) > 5 or average_distance > 300:
+        while counter < 31 or LEVEL[0] <= average_distance <= LEVEL[1] or distance_variance > 4 or abs(vertical_gyro.angle()) > 5 or average_distance > 300:
             counter += 1
             latest_distance_readings.append(ultrasonic.distance())
-
-            if counter % 50 == 0:
+            print("counter:",counter, " avg dst:", average_distance, " variance:", distance_variance, "vert. angle:", vertical_gyro.angle())
+            if counter % 30 == 0:
                 average_distance, distance_variance = do_average_calculation(latest_distance_readings)
             pass
 
@@ -118,7 +118,7 @@ def orientationStep(
             right_motor.run_angle(-CRAWLING_SPEED, crawled_distance*0.6, Stop.BRAKE, wait=True)
 
             if currently_exploring_angle is CENTER:
-                turning.turn_to(75, ev3, horizontal_gyro, left_motor, right_motor, lift_motor, vertical_gyro, ultrasonic)
+                turning.turn_to(80, ev3, horizontal_gyro, left_motor, right_motor, lift_motor, vertical_gyro, ultrasonic)
                 currently_exploring_angle = RIGHT
             elif currently_exploring_angle is RIGHT:
                 turning.turn_to(-170, ev3, horizontal_gyro, left_motor, right_motor, lift_motor, vertical_gyro, ultrasonic)

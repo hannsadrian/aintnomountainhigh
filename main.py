@@ -89,14 +89,14 @@ ev3.screen.draw_text(10, 10, "top reached!")
 
 wait(1000)
 
-finish_off_time = 1500
+finish_off_time = 400
 left_drive_motor.run_time(180, finish_off_time, wait=False)
 right_drive_motor.run_time(180, finish_off_time, wait=True)
 
 turning.turn_to(-80, ev3, horizontal_gyro, left_drive_motor, right_drive_motor, lift_motor, vertical_gyro, distance_sensor)
 
-left_drive_motor.run_time(180, finish_off_time, wait=False)
-right_drive_motor.run_time(180, finish_off_time, wait=True)
+left_drive_motor.run_time(180, finish_off_time*2.5, wait=False)
+right_drive_motor.run_time(180, finish_off_time*2.5, wait=True)
 
 while True:
     pass
