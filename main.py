@@ -67,13 +67,20 @@ while left_drive_motor.angle() < triggering_angle and right_drive_motor.angle() 
 
 ev3.screen.clear()
 
-while True:
+start_off_angle = 90
+left_drive_motor.run_target(180, start_off_angle, wait=False)
+right_drive_motor.run_target(180, start_off_angle, wait=True)
+turning.turn_to(-80, ev3, horizontal_gyro, left_drive_motor, right_drive_motor, lift_motor, vertical_gyro, distance_sensor)
+
+climbing_step_number = 0
+while climbing_step_number < 6:
 
     if program_state == ORIENTING_STATE:
         orientation_result = orientation.orientationStep(
             ev3, left_drive_motor, right_drive_motor, 
             lift_motor, distance_sensor, horizontal_gyro, vertical_gyro)
         if orientation_result is True:
+            vertical_gyro.reset_angle(0)
             program_state = CLIMBING_STATE
         else:
             ev3.screen.clear()
@@ -82,5 +89,8 @@ while True:
     
     if program_state == CLIMBING_STATE:
         climbing.climbingStep(ev3, left_drive_motor, right_drive_motor, lift_motor, vertical_gyro, distance_sensor)
+        climbing_step_number += 1
         program_state = ORIENTING_STATE
             
+ev3.screen.clear()
+ev3.screen.draw_text(10, 10, "top reached!")

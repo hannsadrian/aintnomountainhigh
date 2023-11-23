@@ -3,7 +3,8 @@ from pybricks.ev3devices import Motor, UltrasonicSensor, GyroSensor
 from pybricks.parameters import Stop
 from pybricks.tools import wait
 
-from orientation import LEVEL
+# FIXME: we could import from orientation.py, but it'd be circular referencing
+UPPERBOUNDLEVEL = 152
 
 CLIMBING_SPEED = 720
 
@@ -14,10 +15,9 @@ def climbingStep(
         lift_motor: Motor,
         vertical_gyro: GyroSensor,
         ultrasonic: UltrasonicSensor):
-    vertical_gyro.reset_angle(0)
 
     lift_motor.run(-360)
-    wait(500)
+    wait(200)
     lift_motor.brake()
     lift_motor.reset_angle(0)
     left_motor.run(CLIMBING_SPEED)
@@ -27,7 +27,7 @@ def climbingStep(
         pass
 
     counter = 0
-    while vertical_gyro.angle() > 3 or ultrasonic.distance() > LEVEL[1]:
+    while vertical_gyro.angle() > 3 or ultrasonic.distance() > UPPERBOUNDLEVEL:
         counter += 1
         if counter == 1000:
             lift_motor.run_target(1000, 90, then=Stop.COAST, wait=False)
@@ -40,5 +40,4 @@ def climbingStep(
 
     left_motor.brake()
     right_motor.brake()
-
-    wait(1000)
+    lift_motor.run_target(1000, 0, Stop.BRAKE, wait=True)

@@ -5,13 +5,12 @@ from pybricks.tools import wait
 
 import turning
 
-LEVEL = [130, 152]
-LOW = [105, 130]
-IDEAL = [80, 105]
-HIGH = [0, 80]
+LEVEL = [120, 152]
+LOW = [105, 120]
+IDEAL = [85, 105]
+HIGH = [0, 85]
 
 CRAWLING_SPEED = 180
-BACKING_UP_TIME = 2
 
 LEFT = "LEFT"
 CENTER = "CENTER"
@@ -47,6 +46,10 @@ def orientationStep(
     # turn right 90deg
     # start again
 
+    lift_motor.run(-360)
+    wait(500)
+    lift_motor.brake()
+
     left_step_distance = None
     center_step_distance = None
     right_step_distance = None
@@ -67,15 +70,17 @@ def orientationStep(
         distance_variance = 0
 
         counter = 0
-        while LEVEL[0] < average_distance < LEVEL[1] or distance_variance > 5 or abs(vertical_gyro.angle()) > 5:
+        while LEVEL[0] < average_distance < LEVEL[1] or distance_variance > 2 or abs(vertical_gyro.angle()) > 5 or average_distance > 300:
             counter += 1
             latest_distance_readings.append(ultrasonic.distance())
 
-            if counter % 50 == 0:
+            if counter % 100 == 0:
                 average_distance, distance_variance = do_average_calculation(latest_distance_readings)
             pass
 
         vertical_gyro.reset_angle(0)
+
+        print("EXITED LOOP avg dist:", average_distance, "variance:", distance_variance)
 
         # wait in order to drive a bit further for accurate measurements
         wait(100)
@@ -87,6 +92,7 @@ def orientationStep(
 
         # wait in order to get the vehicle to a rest
         wait(800)
+        average_distance = ultrasonic.distance()
 
         # TODO: check for misreadings, if there are any: move slightly
 
@@ -112,10 +118,10 @@ def orientationStep(
             right_motor.run_angle(-CRAWLING_SPEED, crawled_distance*0.75, Stop.BRAKE, wait=True)
 
             if currently_exploring_angle is CENTER:
-                turning.turn_to(80, horizontal_gyro, left_motor, right_motor, lift_motor)
+                turning.turn_to(85, ev3, horizontal_gyro, left_motor, right_motor, lift_motor, vertical_gyro, ultrasonic)
                 currently_exploring_angle = RIGHT
             elif currently_exploring_angle is RIGHT:
-                turning.turn_to(-180, horizontal_gyro, left_motor, right_motor, lift_motor)
+                turning.turn_to(-180, ev3, horizontal_gyro, left_motor, right_motor, lift_motor, vertical_gyro, ultrasonic)
                 currently_exploring_angle = LEFT
             else:
                 ev3.screen.clear()
