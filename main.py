@@ -46,15 +46,20 @@ while not Button.DOWN in ev3.buttons.pressed():
 
 wait(1000)
 
-horizontal_gyro.reset_angle(0)
-vertical_gyro.reset_angle(0)
-
 ev3.screen.draw_text(10, 10, "waiting to start")
 
+horizontal_gyro.reset_angle(0)
+vertical_gyro.reset_angle(0)
 left_drive_motor.reset_angle(0)
 right_drive_motor.reset_angle(0)
 triggering_angle = 1
-while left_drive_motor.angle() < triggering_angle and right_drive_motor.angle() < triggering_angle:
+counterx = 0
+while left_drive_motor.angle() <= triggering_angle and right_drive_motor.angle() <= triggering_angle:
+    counterx += 1
+    if counterx == 200:
+        ev3.screen.clear()
+        ev3.screen.draw_text(10, 10, "horiz:" + str(horizontal_gyro.angle()))
+        ev3.screen.draw_text(10, 30, "verti:" + str(vertical_gyro.angle()))
     pass
 
 ev3.screen.clear()
@@ -62,7 +67,7 @@ ev3.screen.clear()
 start_off_angle = 90
 left_drive_motor.run_target(180, start_off_angle, wait=False)
 right_drive_motor.run_target(180, start_off_angle, wait=True)
-turning.turn_to(-77, ev3, horizontal_gyro, left_drive_motor, right_drive_motor, lift_motor, vertical_gyro, distance_sensor)
+turning.turn_to(-80, ev3, horizontal_gyro, left_drive_motor, right_drive_motor, lift_motor, vertical_gyro, distance_sensor)
 
 climbing_step_number = 0
 while climbing_step_number < 6:
@@ -93,10 +98,18 @@ finish_off_time = 400
 left_drive_motor.run_time(180, finish_off_time, wait=False)
 right_drive_motor.run_time(180, finish_off_time, wait=True)
 
-turning.turn_to(-80, ev3, horizontal_gyro, left_drive_motor, right_drive_motor, lift_motor, vertical_gyro, distance_sensor)
+turning.turn_to(-45, ev3, horizontal_gyro, left_drive_motor, right_drive_motor, lift_motor, vertical_gyro, distance_sensor)
 
-left_drive_motor.run_time(180, finish_off_time*2.5, wait=False)
-right_drive_motor.run_time(180, finish_off_time*2.5, wait=True)
+left_drive_motor.run_time(180, finish_off_time, wait=False)
+right_drive_motor.run_time(180, finish_off_time, wait=True)
+
+turning.turn_to(-45, ev3, horizontal_gyro, left_drive_motor, right_drive_motor, lift_motor, vertical_gyro, distance_sensor)
+
+
+left_drive_motor.run_time(180, finish_off_time*4, wait=False)
+right_drive_motor.run_time(180, finish_off_time*4, wait=True)
 
 while True:
+    left_drive_motor.brake()
+    right_drive_motor.brake()
     pass

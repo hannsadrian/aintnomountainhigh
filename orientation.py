@@ -10,7 +10,7 @@ LOW = [110, 125]
 IDEAL = [85, 110]
 HIGH = [0, 85]
 
-CRAWLING_SPEED = 90
+CRAWLING_SPEED = 120
 
 LEFT = "LEFT"
 CENTER = "CENTER"
@@ -67,14 +67,19 @@ def orientationStep(
 
         latest_distance_readings = []
         average_distance = ultrasonic.distance()
-        distance_variance = 0
+        distance_variance = 10
 
         counter = 0
-        while counter < 31 or LEVEL[0] <= average_distance <= LEVEL[1] or distance_variance > 4 or abs(vertical_gyro.angle()) > 5 or average_distance > 300:
+        while (counter < 101 or
+               LEVEL[0] <= average_distance <= LEVEL[1] or 
+               distance_variance > 0 or 
+               #abs(vertical_gyro.angle()) > 5 or 
+               average_distance > 300):
             counter += 1
             latest_distance_readings.append(ultrasonic.distance())
-            print("counter:",counter, " avg dst:", average_distance, " variance:", distance_variance, "vert. angle:", vertical_gyro.angle())
-            if counter % 30 == 0:
+            if counter % 50 == 0:
+                print("counter:",counter, " avg dst:", average_distance, " variance:", distance_variance)
+            if counter % 50 == 0:
                 average_distance, distance_variance = do_average_calculation(latest_distance_readings)
             pass
 
@@ -118,7 +123,7 @@ def orientationStep(
             right_motor.run_angle(-CRAWLING_SPEED, crawled_distance*0.6, Stop.BRAKE, wait=True)
 
             if currently_exploring_angle is CENTER:
-                turning.turn_to(80, ev3, horizontal_gyro, left_motor, right_motor, lift_motor, vertical_gyro, ultrasonic)
+                turning.turn_to(87, ev3, horizontal_gyro, left_motor, right_motor, lift_motor, vertical_gyro, ultrasonic)
                 currently_exploring_angle = RIGHT
             elif currently_exploring_angle is RIGHT:
                 turning.turn_to(-170, ev3, horizontal_gyro, left_motor, right_motor, lift_motor, vertical_gyro, ultrasonic)
@@ -128,11 +133,43 @@ def orientationStep(
                 ev3.screen.draw_text(10, 10, "center: " + str(center_step_distance))
                 ev3.screen.draw_text(10, 30, "right: " + str(right_step_distance))
                 ev3.screen.draw_text(10, 60, "left: " + str(left_step_distance))
-                while True:
-                    pass
-                return False
                 
-            
+                highest_distance = max(center_step_distance, right_step_distance, left_step_distance)
+                second_highest_distance = [center_step_distance, right_step_distance, left_step_distance].sort()
+                lowest_distance = min(center_step_distance, right_step_distance, left_step_distance)
+
+                def check_orientation_and_turntowards(dist):
+                    if dist == left_step_distance:
+                        ev3.screen.draw_text(10,30, "not turning")
+                        return True
+                    if dist == center_step_distance:
+                        ev3.screen.draw_text(10,30, "turning to center")
+                        turning.turn_to(80, ev3, horizontal_gyro, left_motor, right_motor, lift_motor, vertical_gyro, ultrasonic)
+                        return True
+                    if dist == right_step_distance:
+                        ev3.screen.draw_text(10,30, "turning to right")
+                        turning.turn_to(170, ev3, horizontal_gyro, left_motor, right_motor, lift_motor, vertical_gyro, ultrasonic)
+                        return True
+                
+                ev3.screen.clear()
+                if highest_distance < LOW[1]: # if its a step at all
+                    ev3.screen.draw_text(10,10, "taking high measurem")
+                    return check_orientation_and_turntowards(highest_distance)
+                elif second_highest_distance[1] < LOW[1]:
+                    ev3.screen.draw_text(10,10, "taking 2nd highest measurem")
+                    return check_orientation_and_turntowards(second_highest_distance[1])
+                elif lowest_distance < LOW[1]:
+                    ev3.screen.draw_text(10,10, "taking lowest measurem")
+                    return check_orientation_and_turntowards(lowest_distance)
+                else:
+                    ev3.screen.clear()
+                    ev3.screen.draw_text(10, 10, "CANNOT TAKE ANY:")
+                    ev3.screen.draw_text(10, 30, "center: " + str(center_step_distance))
+                    ev3.screen.draw_text(10, 60, "right: " + str(right_step_distance))
+                    ev3.screen.draw_text(10, 90, "left: " + str(left_step_distance))
+                    while True:
+                        pass
+
 
 
 def isIdealStep(distance: int) -> bool:

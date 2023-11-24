@@ -39,7 +39,7 @@ def climbingStep(
 
     wait(100)
     if is_in_save_mode:
-        wait(50)
+        wait(20)
 
     left_motor.brake()
     right_motor.brake()
